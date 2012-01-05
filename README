@@ -1,0 +1,35 @@
+(un)ZIP Module for Appcelerator Titanium
+======================
+
+DESCRIPTION
+=======================
+This module allows you to unzip files within titanium.
+Zip support will be added soon.
+
+USAGE
+========================
+var zip = require('de.marcelpociot.zip');
+var zipFile = Ti.Filesystem.getFile('light.zip');
+zip.unzip({
+	filename: zipFile.nativePath, 
+	target: Ti.Filesystem.applicationDataDirectory,
+	success: function(e){
+		alert("Done");
+		var unzipped = Ti.Filesystem.getFile(Ti.Filesystem.applicationDataDirectory,'Light.jpg');
+		alert(unzipped.exists());
+	},
+	error: function(e){
+		alert("error");
+		alert(e);
+	}
+});
+
+TODO
+========================
+Get an array of the unzipped files
+
+ABOUT THE AUTHOR
+========================
+I'm a web enthusiast located in germany.
+Follow me on twitter: @marcelpociot
+Feel free to contact me. 
