@@ -6,6 +6,8 @@ DESCRIPTION
 This module allows you to unzip files within titanium.
 Zip support will be added soon.
 
+Based upon the objective c class from http://code.google.com/p/ziparchive/ (licensed under MIT)
+
 USAGE
 ========================
 var zip = require('de.marcelpociot.zip');
