@@ -1,5 +1,10 @@
 /**
- * Marcel Pociot 2012
+ * Titanium Module Copyright (c) Marcel Pociot 2012
+ *
+ * ZipArchive Class
+ *  Created by aish on 08-9-11.
+ *  acsolu@gmail.com
+ *  Copyright 2008  Inc. All rights reserved.
  *
  * Appcelerator Titanium is Copyright (c) 2009-2010 by Appcelerator, Inc.
  * and licensed under the Apache Public License (version 2)
@@ -92,33 +97,63 @@
 {
     RELEASE_TO_NIL(successCallback);
     ENSURE_SINGLE_ARG(args, NSDictionary);
-    NSString *filename  = [args objectForKey:@"filename"];
+    
+    TiFile *file        = [args objectForKey:@"file"];
+    NSString *filename  = [(TiFile*)file path];
     NSString *target    = [args objectForKey:@"target"];
     successCallback     = [[args objectForKey:@"success"] retain];
     errorCallback       = [[args objectForKey:@"error"] retain];
+    bool overwrite      = [TiUtils boolValue:[args objectForKey:@"overwrite"] def:YES];
 
     ZipArchive *zip = [[ZipArchive alloc] init];
-    
-    NSURL * fileUrl = [NSURL URLWithString:filename];
-    NSString *newfilename =[fileUrl path];
     
     NSURL *targetUrl    = [NSURL URLWithString:target];
     NSString *newtarget = [targetUrl path];
     
-    if( [zip UnzipOpenFile:newfilename] ){
-        BOOL result = [zip UnzipFileTo:newtarget overWrite:YES];
+    if( [zip UnzipOpenFile:filename] ){
+        BOOL result = [zip UnzipFileTo:newtarget overWrite:overwrite];
         if( successCallback != nil ){
-            NSDictionary *event = [NSDictionary dictionaryWithObjectsAndKeys:newtarget,@"target", nil];
+            NSDictionary *event = [NSDictionary 
+                                   dictionaryWithObjectsAndKeys:
+                                   newtarget,@"target",
+                                   zip.unzippedFiles,@"files",
+                                   nil];
             [self _fireEventToListener:@"success" withObject:event listener:successCallback thisObject:nil];
         }
         [zip UnzipCloseFile];
     } else {
         if( errorCallback != nil ){
-            NSDictionary *event = [NSDictionary dictionaryWithObjectsAndKeys:newfilename,@"path", nil];
+            NSDictionary *event = [NSDictionary dictionaryWithObjectsAndKeys:filename,@"path", nil];
             [self _fireEventToListener:@"error" withObject:event listener:errorCallback thisObject:nil];
         }
     }
     [zip release];
+}
+
+-(id)zip:(id)args
+{
+    ENSURE_SINGLE_ARG(args, NSDictionary);
+    RELEASE_TO_NIL(successCallback);
+    TiFile *file        = [args objectForKey:@"file"];
+    NSString *filename  = [(TiFile*)file path];
+
+    successCallback     = [[args objectForKey:@"success"] retain];
+    
+    NSArray *files      = [args objectForKey:@"files"];
+    
+    ZipArchive *zip = [[ZipArchive alloc] init];
+    // Create file
+    [zip CreateZipFile2:filename];
+    // Add files
+    for( NSDictionary* file in files ){
+        NSString *name = [file objectForKey:@"name"];
+        NSString *path = [(TiFile*)[file objectForKey:@"file"] path];
+        [zip addFileToZip:path newname:name];
+    }
+    [zip CloseZipFile2];
+    if( successCallback != nil ){
+        [self _fireEventToListener:@"zipSuccess" withObject:nil listener:successCallback thisObject:nil];
+    }
 }
 
 @end
