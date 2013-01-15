@@ -116,7 +116,6 @@
             NSDictionary *event = [NSDictionary 
                                    dictionaryWithObjectsAndKeys:
                                    newtarget,@"target",
-                                   zip.unzippedFiles,@"files",
                                    nil];
             [self _fireEventToListener:@"success" withObject:event listener:successCallback thisObject:nil];
         }

@@ -1,43 +1,90 @@
-//
-//  ZipArchive.h
+/**
+//  @header ZipArchive.h
 //  
+//  An objective C wrapper for minizip and libz for creating and exanding ZIP files.
 //
-//  Created by aish on 08-9-11.
+//  @author Created by aish on 08-9-11.
 //  acsolu@gmail.com
-//  Copyright 2008  Inc. All rights reserved.
+//  @copyright Copyright 2008  Inc. All rights reserved.
 //
-// History: 
-//    09-11-2008 version 1.0    release
-//    10-18-2009 version 1.1    support password protected zip files
-//    10-21-2009 version 1.2    fix date bug
-//    01-10-2012 version 1.3    titanium improvements (m.pociot@gmail.com)
+*/
 
-#import <UIKit/UIKit.h>
 
 #include "minizip/zip.h"
 #include "minizip/unzip.h"
 
 
+/**
+ a block that is called from UnzipFileTo:overwrite:withProgressBlock: where the percentage of
+ files processed (as an integer from 0 to 100), the number of files processed so far and the
+ total number of files in the archive is called after each file is processed.
+ */
+typedef void(^ZipArchiveProgressUpdateBlock)(int percentage, int filesProcessed, int numFiles);
+	
+/**
+    @protocol
+    @discussion  methods for a delegate to receive error notifications and control overwriting of files
+*/
+
 @protocol ZipArchiveDelegate <NSObject>
 @optional
+
+/**
+    @brief   Delegate method to be notified of errors
+    
+    ZipArchive calls this selector on the delegate when errors are encountered.
+    
+    @param      msg     a string describing the error.
+    @result     void
+*/
+
 -(void) ErrorMessage:(NSString*) msg;
+
+/**
+    @brief   Delegate method to determine if a file should be replaced
+    
+    When an zip file is being expanded and a file is about to be replaced, this selector
+    is called on the delegate to notify that file is about to be replaced. The delegate method
+    should return YES to overwrite the file, or NO to skip it.
+ 
+    @param      file - path to the file to be overwritten.
+    @result     a BOOL - YES to replace, NO to skip
+*/
+
 -(BOOL) OverWriteOperation:(NSString*) file;
 
 @end
 
+/**
+    @class
+    @brief      An object that can create zip files and expand existing ones.
+    This class provides methods to create a zip file (optionally with a password) and
+    add files to that zip archive. 
+                 
+    It also provides methods to expand an existing archive file (optionally with a password),
+    and extract the files.
+*/
 
 @interface ZipArchive : NSObject {
-@public
-    NSMutableArray* unzippedFiles;
 @private
 	zipFile		_zipFile;
 	unzFile		_unzFile;
 	
+    int         _numFiles;
 	NSString*   _password;
 	id			_delegate;
+    ZipArchiveProgressUpdateBlock _progressBlock;
+    
+    NSArray*    _unzippedFiles;
 }
-@property (nonatomic, retain) NSMutableArray *unzippedFiles;
-@property (nonatomic, retain) id delegate;
+
+/** a delegate object conforming to ZipArchiveDelegate protocol */
+@property (nonatomic, retain) id<ZipArchiveDelegate> delegate;
+@property (nonatomic, readonly) int numFiles;
+@property (nonatomic, copy) ZipArchiveProgressUpdateBlock progressBlock;
+
+/** an array of files that were successfully expanded. Available after calling UnzipFileTo:overWrite: */
+@property (nonatomic, readonly) NSArray* unzippedFiles;
 
 -(BOOL) CreateZipFile2:(NSString*) zipFile;
 -(BOOL) CreateZipFile2:(NSString*) zipFile Password:(NSString*) password;
@@ -48,4 +95,6 @@
 -(BOOL) UnzipOpenFile:(NSString*) zipFile Password:(NSString*) password;
 -(BOOL) UnzipFileTo:(NSString*) path overWrite:(BOOL) overwrite;
 -(BOOL) UnzipCloseFile;
+-(NSArray*) getZipFileContents;     // list the contents of the zip archive. must be called after UnzipOpenFile
+
 @end
