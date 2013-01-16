@@ -23,40 +23,10 @@ zip.unzip({
 	// Success callback
 	success: function(e){
 		// Returns unzipped files:
-		alert(e.files);
+		alert("done");
 	},
 	// error callback
-	error: function(e){}
-});
-
-// Zip files
-var zipFiles = [];
-// Just create random files to add
-for( var i=0;i<10;i++ ){
-	var f = Ti.Filesystem.getFile('file_'+i+'.txt');
-	f.write('File '+i);
-	var zipFile = {
-		name: 'filename_'+i+'.txt',	// Filename inside the zip file
-		file: f 					// File content
-	};
-	zipFiles.push(zipFile);
-}
-
-var newZip = Ti.Filesystem.getFile('created.zip');
-zip.zip({
-	// TiFile object containing the zip file to create
-	file:		newZip,
-	// Array with objects (name/file) for the files to add
-	files:		zipFiles,
-    // success callback function
-	success:	function(e){
-		// unzip just to check
-		zip.unzip({
-			file: 	newZip,
-			target:	Ti.Filesystem.applicationDataDirectory,
-			success: function(e){
-				alert("unzip successful");
-			}
-		});
+	error: function(e){
+		alert("error");
 	}
 });

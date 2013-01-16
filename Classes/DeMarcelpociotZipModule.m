@@ -13,7 +13,6 @@
 #import "TiBase.h"
 #import "TiHost.h"
 #import "TiUtils.h"
-#import "ZipArchive.h"
 
 @implementation DeMarcelpociotZipModule
 
@@ -105,13 +104,14 @@
     errorCallback       = [[args objectForKey:@"error"] retain];
     bool overwrite      = [TiUtils boolValue:[args objectForKey:@"overwrite"] def:YES];
 
-    ZipArchive *zip = [[ZipArchive alloc] init];
+    SSZipArchive *zip = [[SSZipArchive alloc] init];
     
     NSURL *targetUrl    = [NSURL URLWithString:target];
     NSString *newtarget = [targetUrl path];
     
-    if( [zip UnzipOpenFile:filename] ){
-        BOOL result = [zip UnzipFileTo:newtarget overWrite:overwrite];
+    BOOL result = [SSZipArchive unzipFileAtPath:filename toDestination:newtarget];
+    
+    if( result ){
         if( successCallback != nil ){
             NSDictionary *event = [NSDictionary 
                                    dictionaryWithObjectsAndKeys:
@@ -119,7 +119,6 @@
                                    nil];
             [self _fireEventToListener:@"success" withObject:event listener:successCallback thisObject:nil];
         }
-        [zip UnzipCloseFile];
     } else {
         if( errorCallback != nil ){
             NSDictionary *event = [NSDictionary dictionaryWithObjectsAndKeys:filename,@"path", nil];
@@ -129,30 +128,26 @@
     [zip release];
 }
 
--(id)zip:(id)args
-{
-    ENSURE_SINGLE_ARG(args, NSDictionary);
-    RELEASE_TO_NIL(successCallback);
-    TiFile *file        = [args objectForKey:@"file"];
-    NSString *filename  = [(TiFile*)file path];
 
-    successCallback     = [[args objectForKey:@"success"] retain];
-    
-    NSArray *files      = [args objectForKey:@"files"];
-    
-    ZipArchive *zip = [[ZipArchive alloc] init];
-    // Create file
-    [zip CreateZipFile2:filename];
-    // Add files
-    for( NSDictionary* file in files ){
-        NSString *name = [file objectForKey:@"name"];
-        NSString *path = [(TiFile*)[file objectForKey:@"file"] path];
-        [zip addFileToZip:path newname:name];
-    }
-    [zip CloseZipFile2];
-    if( successCallback != nil ){
-        [self _fireEventToListener:@"zipSuccess" withObject:nil listener:successCallback thisObject:nil];
-    }
+#pragma mark - SSZipArchiveDelegate
+
+- (void)zipArchiveWillUnzipArchiveAtPath:(NSString *)path zipInfo:(unz_global_info)zipInfo {
+	NSLog(@"*** zipArchiveWillUnzipArchiveAtPath: `%@` zipInfo:", path);
+}
+
+
+- (void)zipArchiveDidUnzipArchiveAtPath:(NSString *)path zipInfo:(unz_global_info)zipInfo unzippedPath:(NSString *)unzippedPath {
+	NSLog(@"*** zipArchiveDidUnzipArchiveAtPath: `%@` zipInfo: unzippedPath: `%@`", path, unzippedPath);
+}
+
+
+- (void)zipArchiveWillUnzipFileAtIndex:(NSInteger)fileIndex totalFiles:(NSInteger)totalFiles archivePath:(NSString *)archivePath fileInfo:(unz_file_info)fileInfo {
+	NSLog(@"*** zipArchiveWillUnzipFileAtIndex: `%ld` totalFiles: `%ld` archivePath: `%@` fileInfo:", fileIndex, totalFiles, archivePath);
+}
+
+
+- (void)zipArchiveDidUnzipFileAtIndex:(NSInteger)fileIndex totalFiles:(NSInteger)totalFiles archivePath:(NSString *)archivePath fileInfo:(unz_file_info)fileInfo {
+	NSLog(@"*** zipArchiveDidUnzipFileAtIndex: `%ld` totalFiles: `%ld` archivePath: `%@` fileInfo:", fileIndex, totalFiles, archivePath);
 }
 
 @end
