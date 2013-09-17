@@ -92,7 +92,7 @@
 
 #pragma Public APIs
 
--(id)unzip:(id)args
+-(void)unzip:(id)args
 {
     RELEASE_TO_NIL(successCallback);
     ENSURE_SINGLE_ARG(args, NSDictionary);
