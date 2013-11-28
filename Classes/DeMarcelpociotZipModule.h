@@ -5,10 +5,11 @@
  * and licensed under the Apache Public License (version 2)
  */
 #import "TiModule.h"
-#import "SSZipArchive.h"
-@interface DeMarcelpociotZipModule : TiModule 
+#import "Zip.h"
+@interface DeMarcelpociotZipModule : TiModule <ZipDelegate>
 {
     KrollCallback *successCallback;
+    KrollCallback *progressCallback;
     KrollCallback *errorCallback;
 }
 

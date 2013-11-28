@@ -8,14 +8,18 @@
 var window = Ti.UI.createWindow({
 	backgroundColor:'white'
 });
+var statusLabel = Ti.UI.createLabel({
+	layout: 'horizontal',
+	text: 'Status'
+})
+window.add( statusLabel );
 window.open();
 
 var zip = require('de.marcelpociot.zip');
 Ti.API.info("module is => " + zip);
-
 zip.unzip({
 	// TiFile object containing the zip file to open
-	file: 		Ti.Filesystem.getFile('light.zip'),
+	file: 		Ti.Filesystem.getFile('documentRoot.zip'),
 	// Directory to extract the files to
 	target: 	Ti.Filesystem.applicationDataDirectory,
 	// OverWrite existing files? default: TRUE
@@ -23,10 +27,15 @@ zip.unzip({
 	// Success callback
 	success: function(e){
 		// Returns unzipped files:
-		alert("done");
+		statusLabel.text = 'Done';
 	},
 	// error callback
 	error: function(e){
-		alert("error");
+		statusLabel.text = 'Error';
+	},
+	progress:function(e)
+	{
+		var progress = Math.round( e.progress * 100 );
+		statusLabel.text = progress + '%';
 	}
 });

@@ -57,6 +57,7 @@
 {
 	// release any resources that have been retained by the module
     RELEASE_TO_NIL(successCallback);
+    RELEASE_TO_NIL(progressCallback);
 	[super dealloc];
 }
 
@@ -101,16 +102,14 @@
     NSString *filename  = [(TiFile*)file path];
     NSString *target    = [args objectForKey:@"target"];
     successCallback     = [[args objectForKey:@"success"] retain];
+    progressCallback      = [[args objectForKey:@"progress"] retain];
     errorCallback       = [[args objectForKey:@"error"] retain];
     bool overwrite      = [TiUtils boolValue:[args objectForKey:@"overwrite"] def:YES];
-
-    SSZipArchive *zip = [[SSZipArchive alloc] init];
     
     NSURL *targetUrl    = [NSURL URLWithString:target];
     NSString *newtarget = [targetUrl path];
     
-    BOOL result = [SSZipArchive unzipFileAtPath:filename toDestination:newtarget];
-    
+    BOOL result = [Zip unpackArchive:filename toPath:newtarget delegate:self];
     if( result ){
         if( successCallback != nil ){
             NSDictionary *event = [NSDictionary 
@@ -125,29 +124,26 @@
             [self _fireEventToListener:@"error" withObject:event listener:errorCallback thisObject:nil];
         }
     }
-    [zip release];
 }
 
 
-#pragma mark - SSZipArchiveDelegate
+#pragma mark - ZipDelegate
 
-- (void)zipArchiveWillUnzipArchiveAtPath:(NSString *)path zipInfo:(unz_global_info)zipInfo {
-	NSLog(@"*** zipArchiveWillUnzipArchiveAtPath: `%@` zipInfo:", path);
-}
-
-
-- (void)zipArchiveDidUnzipArchiveAtPath:(NSString *)path zipInfo:(unz_global_info)zipInfo unzippedPath:(NSString *)unzippedPath {
-	NSLog(@"*** zipArchiveDidUnzipArchiveAtPath: `%@` zipInfo: unzippedPath: `%@`", path, unzippedPath);
-}
-
-
-- (void)zipArchiveWillUnzipFileAtIndex:(NSInteger)fileIndex totalFiles:(NSInteger)totalFiles archivePath:(NSString *)archivePath fileInfo:(unz_file_info)fileInfo {
-	NSLog(@"*** zipArchiveWillUnzipFileAtIndex: `%ld` totalFiles: `%ld` archivePath: `%@` fileInfo:", fileIndex, totalFiles, archivePath);
-}
-
-
-- (void)zipArchiveDidUnzipFileAtIndex:(NSInteger)fileIndex totalFiles:(NSInteger)totalFiles archivePath:(NSString *)archivePath fileInfo:(unz_file_info)fileInfo {
-	NSLog(@"*** zipArchiveDidUnzipFileAtIndex: `%ld` totalFiles: `%ld` archivePath: `%@` fileInfo:", fileIndex, totalFiles, archivePath);
+- (void)unpackProgressDidChange:(float)progress
+{
+    if ( progressCallback != nil ) {
+        dispatch_async( dispatch_get_main_queue(), ^{
+            NSDictionary *event = [NSDictionary
+                                   dictionaryWithObjectsAndKeys:
+                                   @(progress),@"progress",
+                                   nil];
+            NSArray *args = [NSArray arrayWithObject:event];
+            NSLog(@"Progress: %f",progress);
+            [progressCallback call:args thisObject:nil];
+        });
+    } else {
+        NSLog(@"No Eventlistener");
+    }
 }
 
 @end
