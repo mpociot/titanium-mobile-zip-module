@@ -2,7 +2,7 @@
 # this is your module manifest and used by Titanium
 # during compilation, packaging, distribution, etc.
 #
-version: 1.1
+version: 1.2.0
 apiversion: 3
 description: ZIP module for iOS
 author: Marcel Pociot
@@ -15,4 +15,4 @@ name: zip
 moduleid: de.marcelpociot.zip
 guid: dcf69df6-7244-4fe5-b38b-c81058f4e8d7
 platform: iphone
-minsdk: 1.8.0.1
+minsdk: 3.1.3.GA

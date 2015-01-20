@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>3432C0A0-9FA4-41D2-BF3A-444494ADE578</string>
+	<key>IDESourceControlProjectName</key>
+	<string>zip</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>DAF35877EBAE273C26AA0185CC9B6AB505067FFA</key>
+		<string>github.com:mpociot/titanium-mobile-zip-module.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>zip.xcodeproj</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>DAF35877EBAE273C26AA0185CC9B6AB505067FFA</key>
+		<string>../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>github.com:mpociot/titanium-mobile-zip-module.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>111</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>DAF35877EBAE273C26AA0185CC9B6AB505067FFA</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>DAF35877EBAE273C26AA0185CC9B6AB505067FFA</string>
+			<key>IDESourceControlWCCName</key>
+			<string>titanium-mobile-zip-module</string>
+		</dict>
+	</array>
+</dict>
+</plist>
